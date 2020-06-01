@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "name": "tldd",
     "builds": [
         { "src": "*.go", "use": "@now/go" }
     ],
