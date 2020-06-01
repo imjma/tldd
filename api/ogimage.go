@@ -2,15 +2,32 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 
 	"golang.org/x/net/html"
 )
 
+type jsonResponse struct {
+	Data string `json:"data,omitempty"`
+}
+
 func HandleOGImage(w http.ResponseWriter, r *http.Request) {
+	response := processOGImage(r)
+
+	w.Header().Set("Content-Type", "application/json")
+	if response.Data == "" {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	json.NewEncoder(w).Encode(response)
+}
+
+func processOGImage(r *http.Request) jsonResponse {
+	var response jsonResponse
 	if r.Method != http.MethodPost {
-		return
+		return response
 	}
 
 	p := struct {
@@ -19,27 +36,33 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
-		return
+		log.Println(err)
+		return response
 	}
 
 	if p.URL == "" {
-		return
+		log.Println("no url")
+		return response
 	}
+	log.Println("url: ", p.URL)
 
 	req, err := http.NewRequest(http.MethodGet, p.URL, nil)
 	if err != nil {
-		return
+		log.Println(err)
+		return response
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return
+		log.Println(err)
+		return response
 	}
 
 	doc, err := html.Parse(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		return
+		log.Println(err)
+		return response
 	}
 
 	var f func(*html.Node)
@@ -56,7 +79,8 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			if found {
-				fmt.Fprintf(w, result)
+				log.Println(" og:image: ", result)
+				response.Data = result
 				return
 			}
 		}
@@ -65,4 +89,6 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	f(doc)
+
+	return response
 }
