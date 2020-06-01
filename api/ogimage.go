@@ -57,6 +57,7 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 			}
 			if found {
 				fmt.Fprintf(w, result)
+				return
 			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -64,5 +65,4 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	f(doc)
-
 }
