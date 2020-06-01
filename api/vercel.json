@@ -7,7 +7,7 @@
         { "src": "/", "dest": "https://jma.dev?rel=tldd" },
         { "src": "/ogimage", "methods": ["POST"], "dest": "/ogimage.go" }
     ],
-    "function": {
+    "functions": {
         "api/ogimage.go": {
             "maxDuration": 60
         }
