@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -12,12 +13,20 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := r.URL.Query().Get("url")
-	if url == "" {
+	p := struct {
+		URL string `json:"url"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if p.URL == "" {
+		return
+	}
+
+	req, err := http.NewRequest(http.MethodGet, p.URL, nil)
 	if err != nil {
 		return
 	}
@@ -36,18 +45,17 @@ func HandleOGImage(w http.ResponseWriter, r *http.Request) {
 	var f func(*html.Node)
 	f = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "meta" {
-			// Do something with n...
-			matched := false
+			found := false
 			var result string
 			for _, attr := range n.Attr {
 				if attr.Key == "property" && attr.Val == "og:image" {
-					matched = true
+					found = true
 				}
 				if attr.Key == "content" {
 					result = attr.Val
 				}
 			}
-			if matched {
+			if found {
 				fmt.Fprintf(w, result)
 			}
 		}
