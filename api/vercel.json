@@ -1,12 +1,15 @@
 {
     "version": 2,
     "builds": [
-        { "src": "*.html", "use": "@now/static" },
-        { "src": "*.png", "use": "@now/static" },
         { "src": "*.go", "use": "@now/go" }
     ],
     "routes": [
-        { "src": "/", "dest": "/index.html" },
-        { "src": "/ogimage", "dest": "/ogimage.go" }
-    ]
+        { "src": "/", "dest": "https://jma.dev?rel=tldd" },
+        { "src": "/ogimage", "methods": ["POST"], "dest": "/ogimage.go" }
+    ],
+    "function": {
+        "api/ogimage.go": {
+            "maxDuration": 60
+        }
+    }
 }
