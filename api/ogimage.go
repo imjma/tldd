@@ -8,28 +8,28 @@ import (
 )
 
 func HandleOGImage(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Query().Get("u")
+	if r.Method != http.MethodPost {
+		return
+	}
+
+	url := r.URL.Query().Get("url")
 	if url == "" {
-		fmt.Fprintf(w, "u?")
 		return
 	}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
 		return
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
 		return
 	}
 
 	doc, err := html.Parse(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
 		return
 	}
 
