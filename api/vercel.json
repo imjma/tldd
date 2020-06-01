@@ -4,6 +4,7 @@
         { "src": "*.go", "use": "@now/go" }
     ],
     "routes": [
+        { "src": "/", "dest": "/index.html" },
         { "src": "/ogimage", "dest": "/ogimage.go" }
     ]
 }
